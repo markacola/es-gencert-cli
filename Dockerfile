@@ -16,7 +16,8 @@ RUN go build -o ./out/es-gencert-cli .
 FROM alpine:3.9
 RUN apk add ca-certificates bash
 
-COPY --from=build_base /tmp/es-gencert/out/es-gencert-cli /app/es-gencert-cli
+WORKDIR /app
+COPY --from=build_base /tmp/es-gencert/out/es-gencert-cli ./es-gencert-cli
 
 RUN adduser \
     --disabled-password \
@@ -24,10 +25,10 @@ RUN adduser \
     --no-create-home \
     --uid "1000" \
     "eventstore" && \
-chown eventstore:eventstore /app \
+    chown eventstore:eventstore . \
     --recursive
 
 USER eventstore
 ENV PATH=$PATH:/app
-ENTRYPOINT ["/app/es-gencert-cli"]
+ENTRYPOINT ["./es-gencert-cli"]
 CMD []
